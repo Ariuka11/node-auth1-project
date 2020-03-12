@@ -3,6 +3,7 @@ const session = require("express-session")
 const KnexSessionStore = require("connect-session-knex")(session)
 const authRouter = require('./auth/auth-router')
 const userRouter = require('./users/users-router')
+const db = require("./data/config")
 
 const server = express()
 const port = 4000
@@ -22,7 +23,7 @@ server.use(session({
         secure: false
     },
     store: new KnexSessionStore({
-        knex: dbConfig,
+        knex: db,
         createTable: true,
     })
 }))
