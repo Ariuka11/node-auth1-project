@@ -11,7 +11,7 @@ const port = 4000
 
 server.use(express.json())
 
-server.use("/api/register", authRouter)
+server.use("/api", authRouter)
 server.use("/api/users", userRouter)
 server.use(session({
     resave: false,
