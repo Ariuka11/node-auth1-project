@@ -6,7 +6,7 @@ const router = express.Router()
 
 router.post("/register", async (req, res, next) => {
     try {
-        const { username } = req.body
+        const {username} = req.body
         const user = await model.findBy({ username }).first()
 
         if (user) {
@@ -14,6 +14,7 @@ router.post("/register", async (req, res, next) => {
                 message: "Username is already taken"
             })
         }
+
         res.status(201).json(await model.add(req.body))
     } catch (err) {
         next(err)
@@ -27,13 +28,13 @@ router.post("/login", async (req, res, next) => {
 
         const passwordValid = await bcrypt.compare(password, user.password)
 
-        if(!user || !passwordValid) {
+        if (!user || !passwordValid) {
             return res.status(401).json({
                 message: "Invalid Credentials"
             })
         }
         res.json({
-            message : `Welcome ${user.username}`
+            message: `Welcome ${user.username}!`
         })
     } catch (err) {
         next(err)

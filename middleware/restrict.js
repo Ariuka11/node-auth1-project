@@ -5,6 +5,7 @@ function restrict() {
     const error = {
         message: "Invalid credentials",
     }
+    
     return async (req, res, next) => {
         try {
             const { username, password } = req.headers
