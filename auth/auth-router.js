@@ -1,44 +1,55 @@
 const express = require('express')
 const bcrypt = require("bcryptjs")
-const model = require("../users/model")
+const Users = require("../users/model")
 
 const router = express.Router()
 
 router.post("/register", async (req, res, next) => {
-    try {
-        const {username} = req.body
-        const user = await model.findBy({ username }).first()
+	try {
+		const { username } = req.body
+		const user = await Users.findBy({ username }).first()
 
-        if (user) {
-            return res.status(409).json({
-                message: "Username is already taken"
-            })
-        }
+		if (user) {
+			return res.status(409).json({
+				message: "Username is already taken",
+			})
+		}
 
-        res.status(201).json(await model.add(req.body))
-    } catch (err) {
-        next(err)
-    }
+		res.status(201).json(await Users.add(req.body))
+	} catch(err) {
+		next(err)
+	}
 })
 
 router.post("/login", async (req, res, next) => {
-    try {
-        const { username, password } = req.body
-        const user = await model.findBy({ username }).first()
+	try {
+		const { username, password } = req.body
+		const user = await Users.findBy({ username }).first()
+		const passwordValid = await bcrypt.compare(password, user.password)
 
-        const passwordValid = await bcrypt.compare(password, user.password)
+		if (!user || !passwordValid) {
+			return res.status(401).json({
+				message: "Invalid Credentials",
+			})
+		}
 
-        if (!user || !passwordValid) {
-            return res.status(401).json({
-                message: "Invalid Credentials"
-            })
-        }
-        res.json({
-            message: `Welcome ${user.username}!`
-        })
-    } catch (err) {
-        next(err)
-    }
+//      our manual session implementation
+//      **********************************************
+// 		const authToken = Math.random()
+// 		sessions[authToken] = user.id
+// 
+// 		// res.setHeader("Authorization", authToken)
+// 		res.setHeader("Set-Cookie", `token=${authToken}; Path=/`)
+
+		// express-session does the above for us
+		req.session.user = user
+
+		res.json({
+			message: `Welcome ${user.username}!`,
+		})
+	} catch(err) {
+		next(err)
+	}
 })
 
 module.exports = router

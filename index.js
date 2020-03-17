@@ -3,6 +3,7 @@ const session = require("express-session")
 const KnexSessionStore = require("connect-session-knex")(session)
 const authRouter = require('./auth/auth-router')
 const userRouter = require('./users/users-router')
+const dbConfig = require("./data/config")
 
 const server = express()
 const port = 4000
@@ -12,20 +13,21 @@ server.use(express.json())
 
 server.use("/auth", authRouter)
 server.use("/users", userRouter)
-// server.use(session({
-//     resave: false,
-//     saveUninitialized: false,
-//     secret: "life is beautiful",
-//     cookie: {
-//         httpOnly: true,
-//         maxAge: 1000 * 60 * 60 * 24,
-//         secure: false
-//     },
-//     store: new KnexSessionStore({
-//         knex: db,
-//         createTable: true,
-//     })
-// }))
+server.use(session({
+	// name : "token",
+    resave: false,
+    saveUninitialized: false,
+    secret: "life",
+    cookie: {
+        httpOnly: true,
+        // maxAge: 1000 * 60 * 60 * 24,
+        // secure: false
+    },
+    store: new KnexSessionStore({
+        knex: dbConfig,
+        createTable: true,
+    })
+}))
 
 server.get("/", (req, res) => {
     res.send(`<h2>Welcome</h2>`)
